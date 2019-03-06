@@ -1,11 +1,17 @@
 var start = false;
-var doingVT = false;
-var fs = false;
+var beginning = true;
+var fs = false; //controls fullscreen
 var targets = [];
+var time; //game time
+var initTime; //game time of previous frame
+var tbc = []; //time between circles
+var r;
 
 function setup() {
 	let cnv = createCanvas(displayWidth, displayHeight);
 	cnv.style('display', 'block');
+    //initTime = millis();
+    //time = millis();
     for (let i = 0; i < 16; i++) {
   		for (let j = 0; j < 3; j++) {
             targets[i] = new Target(displayWidth/3+j*(displayWidth/6), displayHeight/5);
@@ -27,23 +33,34 @@ function setup() {
 }
 
 function draw() {
-	noFill();
-	textAlign(CENTER);
-	stroke(0);
 	if (windowWidth != displayWidth || windowHeight != displayHeight){
+	    noFill();
+	    textAlign(CENTER);
+	    stroke(0);
         background(255);
 		text("Press 'Enter' to start", windowWidth/2, windowHeight/2);
+        start = false;
 	} else {
 		start = true;
 	}
   	if (start) {
-  		visionTest();
+//        time = millis() - initTime;
+        if (beginning) {
+            visionTest();
+            beginning = false;
+        }
   	}
 }
 
 function mousePressed() {
-	if (doingVT) {
-
+	if (start) {
+        for (let i = 0; i < 16; i++) {
+            if (targets[r].hitbox(mouseX, mouseY)) {
+                visionTest();
+                //initTime = millis();
+                //append(tbc, time);         
+            }        
+        }
 	}
 }
 
@@ -62,17 +79,13 @@ function keyPressed() {
 }
 
 function visionTest() {
-	doingVT = true;
 	background(255);
   	strokeWeight(5);
-    let r = int(random(16));
-    print(r);
-    targets[r].lightUp();
+    r = int(random(16));
     for (let i = 0; i < 16; i++) {
         if (i !== r) {
             targets[i].display();
         }
     }
-    
-  	
+    targets[r].lightUp();
 }
