@@ -1,8 +1,9 @@
 var startVT = false;//start vision test
 var startMG = false;//start mouse game
-var next = false;
 var beginning = true;
 var fs = false; //controls fullscreen
+
+//Vision Test
 var targets = [];
 var time1; //overall game timer
 var time2; //reaction timer
@@ -10,37 +11,42 @@ var initTime; //start time
 var prevTime; //game time of the previous frame
 var tbc = []; //time between circles
 var r;
-var score;
+
+//Mouse Game
+var score = 0;
+var lives = 3;
+var rocks = [];
+var totalRocks = 10;
 
 function setup() {
 	let cnv = createCanvas(displayWidth, displayHeight);
 	cnv.style('display', 'block');
-    prevTime = millis();
-    for (let i = 0; i < 16; i++) {
-  		for (let j = 0; j < 3; j++) {
-            targets[i] = new Target(displayWidth/3+j*(displayWidth/6), displayHeight/5);
-            i++;
-  		}
-  		for (let j = 0; j < 5; j++) {
-  			targets[i] = new Target(displayWidth/6+j*(displayWidth/6), 2*displayHeight/5);
-            i++;
-  		}
-  		for (let j = 0; j < 5; j++) {
-  			targets[i] = new Target(displayWidth/6+j*(displayWidth/6), 3*displayHeight/5);
-            i++;
-  		}
-  		for (let j = 0; j < 3; j++) {
-  			targets[i] = new Target(displayWidth/3+j*(displayWidth/6), 4*displayHeight/5);
-            i++;
-  		}
-  	}
+  prevTime = millis();
+  for (let i = 0; i < 16; i++) {
+		for (let j = 0; j < 3; j++) {
+          targets[i] = new Target(displayWidth/3+j*(displayWidth/6), displayHeight/5);
+          i++;
+		}
+		for (let j = 0; j < 5; j++) {
+			targets[i] = new Target(displayWidth/6+j*(displayWidth/6), 2*displayHeight/5);
+          i++;
+		}
+		for (let j = 0; j < 5; j++) {
+			targets[i] = new Target(displayWidth/6+j*(displayWidth/6), 3*displayHeight/5);
+          i++;
+		}
+		for (let j = 0; j < 3; j++) {
+			targets[i] = new Target(displayWidth/3+j*(displayWidth/6), 4*displayHeight/5);
+          i++;
+		}
+	}
 }
 
 function draw() {
-    stroke(0);
-    textAlign(CENTER);
-    if (!fs){
-    	startScreen();
+  stroke(0);
+  textAlign(CENTER);
+  if (!fs) {
+  	startScreen();
 	}
 	if (startVT) {
         time1 = millis() - initTime;
@@ -50,9 +56,6 @@ function draw() {
             visionTest(time2);
         }
     } else if (startMG) {
-        time1 = millis() - initTime;
-        displayTime(time1);
-        score = 0;
         mouseGame();
             
     }
@@ -60,26 +63,26 @@ function draw() {
 
 function mousePressed() {
 	if (startVT) {
-        for (let i = 0; i < 16; i++) {
-            if (targets[r].hitbox(mouseX, mouseY)) {
-                visionTest();
-                append(tbc, time2);         
-            }        
-        }
-	}
-    if (startMG) {
+    for (let i = 0; i < 16; i++) {
+        if (targets[r].hitbox(mouseX, mouseY)) {
+            visionTest();
+            append(tbc, time2);         
+        }        
     }
+	}
+  if (startMG) {
+  }
 }
 
 function keyPressed() {
-    if (!fs) {
+    if (beginning) {
         if (keyCode === ENTER) {          
             fullscreen(1);
             initTime = millis();
             fs = true;
             startVT = true;      
         }
-    } else if (fs) {
+    } else if (!beginning) {
         if (keyCode === ENTER) {
             fullscreen(0);
             tbc = [];
@@ -87,9 +90,8 @@ function keyPressed() {
             startScreen();   
         }
     }
-    if (keyCode === "b" && next && fs) {
+    if (key === "b") {
         fullscreen(1);
-        iniTime = millis();
         fs = true;
         startMG = true;
     }
@@ -100,6 +102,7 @@ function visionTest() {
   prevTime = millis();
   background(255);
   strokeWeight(5);
+  noFill();
   r = int(random(16));
   for (let i = 0; i < 16; i++) {
       if (i !== r) {
@@ -110,15 +113,32 @@ function visionTest() {
 }
 
 function mouseGame() {
-    fill(0);
-    circle(windowWidth/2, windowHeight/2, 50);
+  background(255);
+  fill(0);
+  if (lives === 0) {
+    mgOver();
+  }
+  if (rocks.length < totalRocks) {
+    append(rocks, new Rock());
+  }
+  for (let i = 0; i < rocks.length; i++) {
+    rocks[i].fall();
+    if (rocks[i].dead()) {
+      rocks.splice(i, 1);
+    }
+    if (rocks[i].hitbox(mouseX, mouseY)) {
+      lives -= 1;
+    }
+  }
+  score++;
+  circle(mouseX, mouseY, 10);
 }
 
 function startScreen() {
-    noFill();
+    fill(0);
     background(255);
     strokeWeight(1);
-    textSize(10);
+    textSize(20);
     text("Press 'Enter' to start", windowWidth/2, windowHeight/2);
     startVT = false;
     startMG = false;
@@ -142,18 +162,33 @@ function displayTime(t) {
 }
 
 function vtOver() {
-    var avgTime;
-    var total = 0;
-    for (let i = 0; i < tbc.length; i++) {
-    total = total + tbc[i];
-    avgTime = total/tbc.length;
-    }
-    background(255);
-    fill(0);
-    strokeWeight(1);
-    textSize(20);
-    text(int(Math.floor(avgTime)) + "ms", windowWidth/2, windowHeight/3);
-    text("Press 'b' to continue", windowWidth/2, 2*windowHeight/3);
-    startVT = false;
-    next = true;
+  var avgTime;
+  var total = 0;
+  for (let i = 0; i < tbc.length; i++) {
+  total = total + tbc[i];
+  avgTime = total/tbc.length;
+  }
+  background(255);
+  fill(0);
+  strokeWeight(1);
+  textSize(20);
+  text(int(Math.floor(avgTime)) + "ms", windowWidth/2, windowHeight/3);
+  text("Press 'b' to continue", windowWidth/2, 2*windowHeight/3);
+  startVT = false;
+}
+
+function mgOver() {
+  background(255);
+  fill(0);
+  strokeWeight(1);
+  textSize(20);
+
+  text("Game Over", windowWidth/2, windowHeight/3);
+  text("Score: " + score, windowWidth/2, 2*windowHeight/3);
+  textSize(10);
+  text("Press 'Enter' to reset", windowWidth/2, 3*windowHeight/4);
+  rocks = [];
+  lives = 3;
+  score = 0;
+  startMG = false;
 }
