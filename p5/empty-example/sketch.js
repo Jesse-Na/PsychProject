@@ -1,4 +1,6 @@
-var start = false;
+var startVT = false;//start vision test
+var startMG = false;//start mouse game
+var next = false;
 var beginning = true;
 var fs = false; //controls fullscreen
 var targets = [];
@@ -8,6 +10,7 @@ var initTime; //start time
 var prevTime; //game time of the previous frame
 var tbc = []; //time between circles
 var r;
+var score;
 
 function setup() {
 	let cnv = createCanvas(displayWidth, displayHeight);
@@ -34,25 +37,29 @@ function setup() {
 }
 
 function draw() {
-  stroke(0);
-  textAlign(CENTER);
-	if (windowWidth != displayWidth || windowHeight != displayHeight){
-    reset();
-	} else {
-		start = true;
+    stroke(0);
+    textAlign(CENTER);
+    if (!fs){
+    	startScreen();
 	}
-	if (start) {
-    time1 = millis() - initTime;
-    displayTime(time1);
-    time2 = millis()  - prevTime;
-    if (beginning) {
-        visionTest(time2);
+	if (startVT) {
+        time1 = millis() - initTime;
+        displayTime(time1);
+        time2 = millis()  - prevTime;
+        if (beginning) {
+            visionTest(time2);
+        }
+    } else if (startMG) {
+        time1 = millis() - initTime;
+        displayTime(time1);
+        score = 0;
+        mouseGame();
+            
     }
-	} 
 }
 
 function mousePressed() {
-	if (start) {
+	if (startVT) {
         for (let i = 0; i < 16; i++) {
             if (targets[r].hitbox(mouseX, mouseY)) {
                 visionTest();
@@ -60,22 +67,32 @@ function mousePressed() {
             }        
         }
 	}
+    if (startMG) {
+    }
 }
 
 function keyPressed() {
-  if (!fs) {
-      if (keyCode === ENTER) {
-          fullscreen(1);
-          initTime = millis();
-          fs = true;        
-      }  
-  } else if (fs) {
-      if (keyCode === ENTER) {
-          fullscreen(0);
-          tbc = [];
-          fs = false;     
-      }
-  }
+    if (!fs) {
+        if (keyCode === ENTER) {          
+            fullscreen(1);
+            initTime = millis();
+            fs = true;
+            startVT = true;      
+        }
+    } else if (fs) {
+        if (keyCode === ENTER) {
+            fullscreen(0);
+            tbc = [];
+            fs = false;
+            startScreen();   
+        }
+    }
+    if (keyCode === "b" && next && fs) {
+        fullscreen(1);
+        iniTime = millis();
+        fs = true;
+        startMG = true;
+    }
 }
 
 function visionTest() {
@@ -92,20 +109,26 @@ function visionTest() {
   targets[r].lightUp();
 }
 
-function reset() {
-  noFill();
-  background(255);
-  strokeWeight(1);
-  textSize(10);
-  text("Press 'Enter' to start", windowWidth/2, windowHeight/2);
-  start = false;
-  beginning = true;
+function mouseGame() {
+    fill(0);
+    circle(windowWidth/2, windowHeight/2, 50);
+}
+
+function startScreen() {
+    noFill();
+    background(255);
+    strokeWeight(1);
+    textSize(10);
+    text("Press 'Enter' to start", windowWidth/2, windowHeight/2);
+    startVT = false;
+    startMG = false;
+    beginning = true;
 }
 
 function displayTime(t) {
   let time = t;
   if (time >= 10000) {
-    gameOver();
+    vtOver();
   } else {
     fill(255);
     noStroke();
@@ -118,16 +141,19 @@ function displayTime(t) {
   }
 }
 
-function gameOver() {
-  var avgTime;
-  var total = 0;
-  for (let i = 0; i < tbc.length; i++) {
+function vtOver() {
+    var avgTime;
+    var total = 0;
+    for (let i = 0; i < tbc.length; i++) {
     total = total + tbc[i];
     avgTime = total/tbc.length;
-  }
-  background(255);
-  fill(0);
-  strokeWeight(1);
-  textSize(10);
-  text(int(Math.floor(avgTime)) + "ms", windowWidth/2, windowHeight/2);
+    }
+    background(255);
+    fill(0);
+    strokeWeight(1);
+    textSize(20);
+    text(int(Math.floor(avgTime)) + "ms", windowWidth/2, windowHeight/3);
+    text("Press 'b' to continue", windowWidth/2, 2*windowHeight/3);
+    startVT = false;
+    next = true;
 }
