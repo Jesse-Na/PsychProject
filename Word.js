@@ -3,7 +3,7 @@ function Word(word, displayWidth) {
 	this.wordSize = 20 + Math.random() * 50;
 
 	this.speedX = 0;
-	this.speedY = 2;
+	this.speedY = 1;
 
 	this.x = 200 + Math.random() * (displayWidth - 300) || 200;
 	this.y = 0;
