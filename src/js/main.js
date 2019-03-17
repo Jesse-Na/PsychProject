@@ -2,6 +2,8 @@ let fallingWords;
 let score = 0;
 let scoreRed, scoreGreen, scoreBlue = 0;
 
+let mistakes = 3;
+
 let height, width;
 
 let screen = 0;
@@ -11,7 +13,7 @@ let previousTime;
 
 function setup() {
 	width = displayWidth - 100;
-	height = displayHeight - 400;
+	height = displayHeight - 300;
 	createCanvas(width, height);
 	fallingWords = [];
 }
@@ -40,7 +42,7 @@ function informationScreen() {
 
 				You are scored based on the accuracy of your typing.
 
-				You have 60 seconds. Good luck!
+				You have 60 seconds and are allowed 3 missed words. Good luck!
 
 				Press any key to continue.
 				`, width/2, height/6);
@@ -49,9 +51,10 @@ function endScreen() {
 	background(255);
 	textSize(30);
 	textAlign(CENTER);
-	text(`You scored a total of ${score} points!
+	text(`
+				You scored a total of ${score} points!
 
-				Press any key to play again.`, width/2, height/6);
+				Click the screen to play again.`, width/2, height/6);
 }
 function game() {
 	console.log(second());
@@ -68,9 +71,9 @@ function game() {
 	}
 	textSize(30);
 	text(`Score: ${score}`, width/100, height/15);
-	text(`Time: ${gameTime}`, width/100, height/6);
-
-	if (gameTime < 1) {
+	text(`Time: ${gameTime}`, width/100, 2.2*height/15);
+	text(`Mistakes: ${mistakes}`, width/100, 3.4*height/15);
+	if (gameTime < 1 || mistakes <= 0) {
 		screen++;
 	}
 	//console.log(currentTime);
@@ -83,12 +86,13 @@ function game() {
 	 if (fallingWords[0].y > height) {
 		 fallingWords.shift();
 		 score -= 50;
+		 mistakes--;
 		};
 	}
 	if (frameCount % 100 == 0) addWords();
 }
  function addWords() {
-	 fallingWords.push(new Word(randomWord(), width));
+	 fallingWords.push(new Word(randomWord(), width, map(gameTime, 60, 0, 0.5, 2)));
  }
  function randomWord() {
 	 return hamletText[Math.floor(Math.random() * hamletText.length)].trim();
@@ -113,10 +117,14 @@ function keyPressed() {
 
 			score--;
 		}
-	} else if (screen == 2) {
+	}
+}
+function mousePressed() {
+	if (screen == 2) {
 		screen--;
 		gameTime = 60;
 		score = 0;
+		mistakes = 3;
+		fallingWords = []
 	}
-
 }

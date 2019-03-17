@@ -1,9 +1,9 @@
-function Word(word, displayWidth) {
+function Word(word, displayWidth, speedY) {
 	this.word = word.toLowerCase();
 	this.wordSize = 20 + Math.random() * 50;
 
 	this.speedX = 0;
-	this.speedY = 1;
+	this.speedY = speedY;
 
 	this.x = 200 + Math.random() * (displayWidth - 300) || 200;
 	this.y = 0;
