@@ -8,6 +8,10 @@ function Word(word, displayWidth) {
 	this.x = 200 + Math.random() * (displayWidth - 300) || 200;
 	this.y = 0;
 
+	this.r = 0;
+	this.b = 0;
+	this.g = 0;
+
 	this.length = function() {
 		return this.word.length;
 	}
@@ -17,6 +21,7 @@ function Word(word, displayWidth) {
 	}
 
 	this.display = function() {
+		fill(this.r, this.g, this.b);
 		textSize(this.wordSize);
 		text(this.word, this.x, this.y);
 	}

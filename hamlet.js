@@ -4462,4 +4462,4 @@ Enter Hamlet and Horatio.
 
 THE END
 `.replace(/(\r\n|\n|\r)/gm, " ").replace(/[.\[\],\/#!$?%\^&\*;:{}'=\-_`~()]/g,"").split(" ");
-hamletText = hamletText.filter((word) => word.length > 3);
+hamletText = hamletText.filter((word) => word.length > 8);
