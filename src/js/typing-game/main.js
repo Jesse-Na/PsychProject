@@ -57,7 +57,6 @@ function endScreen() {
 				Click the screen to play again.`, width/2, height/6);
 }
 function game() {
-	console.log(second());
 	textAlign(LEFT);
 	background(255);
 	fill(scoreRed, scoreGreen, scoreBlue);
