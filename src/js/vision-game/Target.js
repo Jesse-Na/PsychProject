@@ -7,21 +7,21 @@ class Target {
     hitbox (xVal, yVal) {
         if (xVal >= this.x - this.diameter && xVal <= this.x + this.diameter) {
             if (yVal >= this.y - this.diameter && yVal <= this.y + this.diameter) {
-                return true;          
+                return true;
             } else {
                 return false;
             }
         } else {
-            return false;        
+            return false;
         }
     }
     lightUp () {
         fill(255, 0, 0);
         circle(this.x, this.y, this.diameter);
     }
-    
+
     display() {
         noFill();
-        circle(this.x, this.y, this.diameter);    
+        circle(this.x, this.y, this.diameter);
     }
 }
