@@ -30,7 +30,7 @@ function keyPressed() {
 function mouseGame() {
   background(255);
   fill(0);
-  if (lives === 0) {
+  if (lives < 0) {
     mgOver();
   } else {
 	  if (rocks.length < totalRocks) {
