@@ -56,3 +56,10 @@ li a {
 li a:hover {
   background-color: #d9e5f9;
 }
+.more-information:hover {
+  background-color: #d9e5f9;
+}
+.main-text h1 {
+  padding: 2px 16px;
+  font-size: 20px;
+}
